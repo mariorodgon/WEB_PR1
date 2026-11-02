@@ -36,8 +36,10 @@
    ============================================================================= */
 
 class Show {
-  // Recordad: el valor de rating debe guardarse en un campo con otro nombre
-  // (por ejemplo, un campo privado #rating).
+
+  // Propiedad privada para rating: la inicializamos como null para asegurar que en el setter si no es un valor válido 
+  // se mantenga como null. Accedemos a ella mediante el getter/setter
+  #rating = null;
 
   constructor({
     id,
@@ -54,14 +56,83 @@ class Show {
     weight,
     episodes,
   }) {
-    // ...
+     // Se comprueba que el identificador sea un entero positivo.
+    if (!Number.isInteger(id) || id <= 0) {
+      console.warn('Show: id --> "${id}", debe ser un número entero positivo.');
+    }
+    this.id = id;
+
+    // Se comprueba que el nombre sea un texto no vacío.
+    if (typeof name !== 'string' || name.trim() === '') {
+      console.warn('Show: name --> "${name}", debe ser un texto no vacío.');
+    }
+    this.name = name;
+    
+    this.summary = summary;
+    this.premiered = premiered;
+    this.status = status;
+    this.rating = rating; // El setter validará que el valor es válido. Iniciado como NULL
+    this.type = type;
+
+    // Si genres no es un array, se inicializa vacío.
+    if (Array.isArray(genres)) {
+      this.genres = genres;
+    } else {
+      console.warn('Show: genres --> "${genres}", debe ser un array.');
+      this.genres = [];
+    }
+
+    this.network = network;
+    this.webChannel = webChannel;
+    this.imageUrl = imageUrl;
+    this.weight = weight;
+
+    // Si episodes no es un array, se inicializa vacío.
+    if (Array.isArray(episodes)) {
+      this.episodes = episodes;
+    } else {
+      console.warn('Show: episodes --> "${episodes}",  debe ser un array.');
+      this.episodes = [];
+    
   }
+}
 
   // ── Getters y setters ────────────────────────────────────────────────────
 
   // get rating() / set rating(newRating)
 
+/** 
+ * Getter para el valor de rating
+ * @returns {number|null} Devuelve la puntuación media de la serie. 
+ */
+  get rating() {
+    return this.#rating;
+  }
+
+  /**
+   * Setter para el valor de rating
+   * Se hace la comprobación de un valor válido (número entre 0 y 10, o NULL).
+   * Si el valor no es válido, avisa y mantiene el valor anterior.
+   * @param {number|null} value
+   */
+  set rating(value) {
+    if (!isValidRating(value)) {
+      console.warn(`Show: rating "${value}" no válido (debe ser null o un número entre 0 y 10).`);
+      return;
+    }
+    this.#rating = value;
+  }
+ 
   // get platform()
+  /** 
+   * Getter para el valor de platform (cadena o plataforma de emisión).
+   * @returns {string|null} Devuelve el nombre de cadena o, si no hay, de plataforma;
+   *   Si no tiene ninguna de las dos, devuelve NULL.
+   */
+  get platform() {
+    return this.network?.name ?? this.webChannel?.name ?? null;
+  }
+
 }
 
 
