@@ -58,13 +58,13 @@ class Show {
   }) {
      // Se comprueba que el identificador sea un entero positivo.
     if (!Number.isInteger(id) || id <= 0) {
-      console.warn('Show: id --> "${id}", debe ser un número entero positivo.');
+      console.warn(`Show: id --> "${id}", debe ser un número entero positivo.`);
     }
     this.id = id;
 
     // Se comprueba que el nombre sea un texto no vacío.
     if (typeof name !== 'string' || name.trim() === '') {
-      console.warn('Show: name --> "${name}", debe ser un texto no vacío.');
+      console.warn(`Show: name --> "${name}", debe ser un texto no vacío.`);
     }
     this.name = name;
     
@@ -78,7 +78,7 @@ class Show {
     if (Array.isArray(genres)) {
       this.genres = genres;
     } else {
-      console.warn('Show: genres --> "${genres}", debe ser un array.');
+      console.warn(`Show: genres --> "${genres}", debe ser un array.`);
       this.genres = [];
     }
 
@@ -91,7 +91,7 @@ class Show {
     if (Array.isArray(episodes)) {
       this.episodes = episodes;
     } else {
-      console.warn('Show: episodes --> "${episodes}",  debe ser un array.');
+      console.warn(`Show: episodes --> "${episodes}",  debe ser un array.`);
       this.episodes = [];
     
   }
@@ -116,11 +116,17 @@ class Show {
    * @param {number|null} value
    */
   set rating(value) {
-    if (!isValidRating(value)) {
-      console.warn(`Show: rating "${value}" no válido (debe ser null o un número entre 0 y 10).`);
-      return;
+    if (
+        value === null ||
+        (typeof value === 'number' &&
+         Number.isFinite(value) &&
+         value >= 0 &&
+         value <= 10)
+    ) {
+        this.#rating = value;
+    } else {
+        console.warn(`Show: rating --> "${value}", no válido (debe ser null o un número entre 0 y 10).`);
     }
-    this.#rating = value;
   }
  
   // get platform()
@@ -472,4 +478,77 @@ const TODAY = new Date(2026, 10, 13);
    los casos límite que indica el enunciado.
    ============================================================================= */
 
-// ...
+
+// =============================================================================
+// PRUEBAS — ETAPA 1
+// =============================================================================
+
+console.log('===== PRUEBAS ETAPA 1: CLASE SHOW =====');
+console.log('');
+console.log('');
+
+
+console.log('****************************************************');
+console.log('****   Verificación de Propiedades y getters    ****');
+console.log('****************************************************');
+console.log('');
+console.log('Breaking Bad - Nombre:', breakingBad.name);
+console.log('Severance - ID:', severance.id);
+console.log('GOT - Rating:', gameOfThrones.rating);
+console.log('The last of us - Plataforma:', theLastOfUs.platform);
+console.log('');
+
+
+console.log('****************************************************');
+console.log('****   Verificación de distintas plataformas    ****');
+console.log('****************************************************');
+console.log('');
+console.log('Stranger Things - Plataforma:', strangerThings.platform);
+console.log('Proyecto Aurora - Plataforma:', proyectoAurora.platform);
+console.log('');
+
+console.log('***************************************');
+console.log('******   Verificación de Rating  ******');
+console.log('***************************************');
+console.log('');
+const originalRating = breakingBad.rating;                          // Lo guardo para reestablecerlo al final
+breakingBad.rating = 8.2;                                           // Cambio a 8.2
+console.log('Rating tras setter válido:', breakingBad.rating);        // 8.2
+breakingBad.rating = 15;                                            // Mayor de 10
+console.log('Rating tras setter inválido:', breakingBad.rating);      // 8.2
+breakingBad.rating = -1;                                            // Menor de 0
+console.log('Rating tras setter inválido:', breakingBad.rating);      // 8.2
+breakingBad.rating = '5';                                           // No es un número
+console.log('Rating tras setter inválido:', breakingBad.rating);      // 8.2
+breakingBad.rating = null;                                          // NULL
+console.log('Rating tras setter null:', breakingBad.rating);          // null
+breakingBad.rating = originalRating;                                // se restaura el dato original
+
+console.log('');
+console.log('****************************************************');
+console.log('* Verificación de Constructor con datos invalidos  *');
+console.log('****************************************************');
+const invalidShow = new Show({
+    id: -5,
+    name: '   ',
+    summary: '...',
+    premiered: '2026-11-02',
+    status: 'Ended',
+    rating: 15,
+    type: 'Scripted',
+    genres: 'Drama',
+    network: null,
+    webChannel: null,
+    imageUrl: '',
+    weight: 1,
+    episodes: 'no soy un array'
+});
+
+console.log('');
+console.log('ID de serie en el Constructor:', invalidShow.id);
+console.log('Nombre de serie invalido en el Constructor:', invalidShow.name);
+console.log('Rating de serie invalido en el Constructor:', invalidShow.rating);
+console.log('Géneros de serie invalido en el Constructor:', invalidShow.genres);
+console.log('Episodios de serie invalido en el Constructor:', invalidShow.episodes);
+
+
