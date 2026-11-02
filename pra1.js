@@ -92,10 +92,9 @@ class Show {
       this.episodes = episodes;
     } else {
       console.warn(`Show: episodes --> "${episodes}",  debe ser un array.`);
-      this.episodes = [];
-    
+      this.episodes = [];  
+    }
   }
-}
 
   // ── Getters y setters ────────────────────────────────────────────────────
 
@@ -133,12 +132,20 @@ class Show {
   /** 
    * Getter para el valor de platform (cadena o plataforma de emisión).
    * @returns {string|null} Devuelve el nombre de cadena o, si no hay, de plataforma;
-   *   Si no tiene ninguna de las dos, devuelve NULL.
+   *    Si no tiene ninguna de las dos, devuelve NULL.
+   *    
+   *    Uso de la estructura:
+   *      En lugar de evaluar con condiciones "if" anidadas, hago uso de dos operadores vistos en la documentación 
+   *      en internet para que no falle la evaluación en caso de que no exista la variable, quedando un codigo limpio y
+   *      combinando encadenamiento opcional y fusión nula. 
+   *      - Con el operador ??, consigo que se asegure el retorno de null en caso de que alguna de las propiedades
+   *        no esté definida, que carezcan del campo name o valga null.
+   *      - Con el operador ?, evaluo si la propiedad name de la cadena o plataforma es null 
+   *        evitando un error en la evaluación.
    */
   get platform() {
     return this.network?.name ?? this.webChannel?.name ?? null;
   }
-
 }
 
 
