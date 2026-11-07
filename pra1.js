@@ -407,11 +407,21 @@ class ShowList {
   };
 
   /**
-   * Devuelve los pares { show, progress } con rating dentro del rango
-   * [minRating, maxRating].
+   * No modifica el array interno de la lista.
+   * @returns {Array} Devuelve los pares { show, progress } con rating dentro del rango
+   *                  [minRating, maxRating].
    */
-  getShowsByRatingRange = (minRating, maxRating) => {
-    // ...
+  sortShowsByPopularity = () => {
+
+    // Crea una copia del array original para no modificar la lista.
+    const sortedShowEntries = this.#showEntries.slice();
+
+    // Ordena las series según su popularidad (weight), de mayor a menor.
+    sortedShowEntries.sort((firstEntry, secondEntry) => {
+      return secondEntry.show.weight - firstEntry.show.weight;
+    });
+
+    return sortedShowEntries;
   };
 
   /**
@@ -455,14 +465,43 @@ class ShowList {
   /* ===========================================================================
      ETAPA 5.2 — markEpisodeWatched (forma parte de la etapa 5)
      =========================================================================== */
-
+  
   /**
    * Avanza el progreso de una serie hasta su siguiente episodio.
-   * Devuelve el episodio marcado como visto, o null.
+   * @param {number} showId Identificador de la serie.
+   * @returns {Object|null} Devuelve el episodio marcado como visto o null.
    */
   markEpisodeWatched(showId) {
-    // ...
-  }
+
+    // Busca la serie dentro de la lista.
+    const showEntry = this.#showEntries.find(
+      showEntry => showEntry.show.id === showId
+    );
+
+    // Comprueba si la serie existe.
+    if (showEntry === undefined) {
+      console.warn('ShowList: no existe ninguna serie con ese ID.');
+      return null;
+    }
+
+    // Busca el siguiente episodio pendiente.
+    const nextEpisode = getNextPendingEpisode(
+      showEntry.show,
+      showEntry.progress
+    );
+
+    // Comprueba si quedan episodios pendientes.
+    if (nextEpisode === null) {
+      console.warn('ShowList: la serie ha terminado. No quedan episodios pendientes.');
+      return null;
+    }
+
+    // Actualiza el progreso con el episodio encontrado.
+    showEntry.progress.advance(nextEpisode.season, nextEpisode.number);
+
+    return nextEpisode;
+  };
+
 }
 
 
@@ -472,11 +511,37 @@ class ShowList {
 
 /**
  * 5.1 — Busca recursivamente un episodio por temporada y número.
- * Devuelve el episodio o null si no existe.
+ * @param {Array<Object>} episodes Array de episodios de la serie.
+ * @param {number} season Temporada que queremos localizar.
+ * @param {number} number Número de episodio que queremos localizar.
+ * @param {number} index Posición del array que se está comprobando.
+ * @returns {Object|null} Devuelve el episodio encontrado o null si no existe.
  */
-const findEpisodeByNumber = (episodes, season, number) => {
-  // ...
+
+const findEpisodeByNumber = (episodes, season, number, index = 0) => {
+
+  // Comprueba que los datos recibidos sean válidos.
+  if (!Array.isArray(episodes) || !Number.isInteger(season) || season <= 0 || !Number.isInteger(number) || number <= 0) {
+    return null;
+  }
+
+  // Comprueba si hemos llegado al final del array.
+  if (index >= episodes.length) {
+    return null;
+  }
+
+  // Obtiene el episodio de la posición actual.
+  const currentEpisode = episodes[index];
+
+  // Comprueba si es el episodio que estamos buscando.
+  if (currentEpisode.season === season && currentEpisode.number === number) {
+    return currentEpisode;
+  }
+
+  // Si no coincide, continúa buscando en la siguiente posición.
+  return findEpisodeByNumber(episodes, season, number, index + 1);
 };
+
 
 
 /* =============================================================================
@@ -516,10 +581,38 @@ const daysUntil = (isoDate, today = new Date()) => {
 };
 
 /**
- * Devuelve el siguiente episodio pendiente de una serie, o null.
+ * Avanza el progreso de una serie hasta su siguiente episodio.
+ * @param {Show} show Serie cuyos episodios queremos consultar.
+ * @param {Progress} progress Progreso actual de la serie.
+ * @returns {Object|null} Devuelve el siguiente episodio o null si no existe.
  */
 const getNextPendingEpisode = (show, progress) => {
-  // ...
+
+  // Si la serie todavía no ha comenzado, busca el primer episodio.
+  if (progress.currentSeason === 0 && progress.currentEpisode === 0) {
+    return findEpisodeByNumber(show.episodes, 1, 1);
+  }
+
+  // Busca el siguiente episodio de la temporada actual.
+  let nextEpisode = findEpisodeByNumber(
+    show.episodes,
+    progress.currentSeason,
+    progress.currentEpisode + 1
+  );
+
+  // Si lo encuentra, lo devuelve.
+  if (nextEpisode !== null) {
+    return nextEpisode;
+  }
+
+  // Si no existe, busca el primer episodio de la siguiente temporada.
+  nextEpisode = findEpisodeByNumber(
+    show.episodes,
+    progress.currentSeason + 1,
+    1
+  );
+
+  return nextEpisode;
 };
 
 /* =============================================================================
@@ -1069,3 +1162,117 @@ showsByPopularity.forEach(showEntry => {
 });
 
 
+
+// =============================================================================
+// PRUEBAS — ETAPA 5
+// =============================================================================
+console.log('');
+console.log('');
+console.log('===== PRUEBAS ETAPA 5: RECURSIVIDAD =====');
+console.log('');
+console.log('');
+console.log('****************************************************');
+console.log('*             Búsqueda de episodio existente        *');
+console.log('****************************************************');
+console.log('');
+
+const episodeFound = findEpisodeByNumber(breakingBad.episodes, 1, 2);
+
+console.log('Episodio encontrado:', episodeFound);
+
+console.log('');
+console.log('****************************************************');
+console.log('*             Búsqueda de episodio inexistente      *');
+console.log('****************************************************');
+console.log('');
+
+const episodeNotFound = findEpisodeByNumber(breakingBad.episodes, 5, 1);
+
+console.log('Episodio encontrado:', episodeNotFound);
+
+console.log('');
+console.log('****************************************************');
+console.log('*              Búsqueda con datos inválidos         *');
+console.log('****************************************************');
+console.log('');
+
+console.log(
+  'Array inválido:',
+  findEpisodeByNumber('no es un array', 1, 1)
+);
+
+console.log(
+  'Temporada inválida:',
+  findEpisodeByNumber(breakingBad.episodes, 0, 1)
+);
+
+console.log(
+  'Episodio inválido:',
+  findEpisodeByNumber(breakingBad.episodes, 1, -2)
+);
+
+console.log('');
+console.log('****************************************************');
+console.log('*              Avance automático del progreso       *');
+console.log('****************************************************');
+console.log('');
+
+const episodeTestList = new ShowList();
+
+episodeTestList.addShow(breakingBad);
+
+// Primer avance: debe marcar T1E1.
+let watchedEpisode = episodeTestList.markEpisodeWatched(breakingBad.id);
+
+console.log('Episodio marcado:', watchedEpisode.name);
+console.log('Temporada:', episodeTestList.entries[0].progress.currentSeason);
+console.log('Episodio:', episodeTestList.entries[0].progress.currentEpisode);
+
+console.log('');
+
+// Segundo avance: debe marcar T1E2.
+watchedEpisode = episodeTestList.markEpisodeWatched(breakingBad.id);
+
+console.log('Episodio marcado:', watchedEpisode.name);
+console.log('Temporada:', episodeTestList.entries[0].progress.currentSeason);
+console.log('Episodio:', episodeTestList.entries[0].progress.currentEpisode);
+
+console.log('');
+console.log('****************************************************');
+console.log('*             Cambio de temporada                  *');
+console.log('****************************************************');
+console.log('');
+
+// Avanza hasta completar T1E3.
+episodeTestList.markEpisodeWatched(breakingBad.id);
+
+// El siguiente episodio debe ser T2E1.
+watchedEpisode = episodeTestList.markEpisodeWatched(breakingBad.id);
+
+console.log('Episodio marcado:', watchedEpisode.name);
+console.log('Temporada:', episodeTestList.entries[0].progress.currentSeason);
+console.log('Episodio:', episodeTestList.entries[0].progress.currentEpisode);
+
+console.log('');
+console.log('****************************************************');
+console.log('*              Serie terminada                     *');
+console.log('****************************************************');
+console.log('');
+
+// Avanza hasta completar T2E2.
+episodeTestList.markEpisodeWatched(breakingBad.id);
+
+// Ya no quedan episodios disponibles.
+watchedEpisode = episodeTestList.markEpisodeWatched(breakingBad.id);
+
+console.log('Resultado del último avance:', watchedEpisode);
+console.log('Temporada:', episodeTestList.entries[0].progress.currentSeason);
+console.log('Episodio:', episodeTestList.entries[0].progress.currentEpisode);
+
+console.log('');
+console.log('****************************************************');
+console.log('*              Serie inexistente                   *');
+console.log('****************************************************');
+console.log('');
+
+console.log('Resultado:', episodeTestList.markEpisodeWatched(99999));
