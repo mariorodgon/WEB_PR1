@@ -779,19 +779,18 @@ const TODAY = new Date(2026, 10, 13);
    los casos límite que indica el enunciado.
    ============================================================================= */
 
-
 // =============================================================================
 // PRUEBAS — ETAPA 1
 // =============================================================================
 
-console.log('===== PRUEBAS ETAPA 1: CLASE SHOW =====');
+console.log('****************************************************');
+console.log('****        PRUEBAS ETAPA 1: CLASE SHOW        ****');
+console.log('****************************************************');
 console.log('');
 console.log('');
 
 
-console.log('****************************************************');
-console.log('****   Verificación de Propiedades y getters    ****');
-console.log('****************************************************');
+console.log('===== Verificación de Propiedades y getters =====');
 console.log('');
 console.log('Breaking Bad - Nombre:', breakingBad.name);
 console.log('Severance - ID:', severance.id);
@@ -800,17 +799,14 @@ console.log('The last of us - Plataforma:', theLastOfUs.platform);
 console.log('');
 
 
-console.log('****************************************************');
-console.log('****   Verificación de distintas plataformas    ****');
-console.log('****************************************************');
+console.log('===== Verificación de distintas plataformas =====');
 console.log('');
 console.log('Stranger Things - Plataforma:', strangerThings.platform);
 console.log('Proyecto Aurora - Plataforma:', proyectoAurora.platform);
 console.log('');
 
-console.log('***************************************');
-console.log('******   Verificación de Rating  ******');
-console.log('***************************************');
+
+console.log('===== Verificación de Rating =====');
 console.log('');
 const originalRating = breakingBad.rating;                          // Lo guardo para reestablecerlo al final
 breakingBad.rating = 8.2;                                           // Cambio a 8.2
@@ -826,9 +822,8 @@ console.log('Rating tras setter null:', breakingBad.rating);          // null
 breakingBad.rating = originalRating;                                // se restaura el dato original
 
 console.log('');
-console.log('****************************************************');
-console.log('* Verificación de Constructor con datos invalidos  *');
-console.log('****************************************************');
+console.log('===== Verificación de Constructor con datos inválidos =====');
+console.log('');
 const invalidShow = new Show({
     id: -5,
     name: '   ',
@@ -857,15 +852,17 @@ console.log('Episodios de serie invalido en el Constructor:', invalidShow.episod
 // =============================================================================
 // PRUEBAS — ETAPA 2
 // =============================================================================
+
 console.log('');
 console.log('');
-console.log('===== PRUEBAS ETAPA 2: CLASE PROGRESS =====');
+console.log('****************************************************');
+console.log('****       PRUEBAS ETAPA 2: CLASE PROGRESS     ****');
+console.log('****************************************************');
 console.log('');
 console.log('');
 
-console.log('****************************************************');
-console.log('*                Verificación inicial              *');
-console.log('****************************************************');
+
+console.log('===== Verificación inicial =====');
 console.log('');
 
 const progressTest = new Progress(breakingBad.id);
@@ -876,9 +873,7 @@ console.log('Episodio inicial:', progressTest.currentEpisode);
 console.log('¿Ha comenzado?:', progressTest.hasStarted);
 
 console.log('');
-console.log('****************************************************');
-console.log('*                Avance válido                     *');
-console.log('****************************************************');
+console.log('===== Avance válido =====');
 console.log('');
 console.log('Resultado:', progressTest.advance(1, 3));
 console.log('Temporada:', progressTest.currentSeason);
@@ -886,27 +881,21 @@ console.log('Episodio:', progressTest.currentEpisode);
 console.log('¿Ha comenzado?:', progressTest.hasStarted);
 
 console.log('');
-console.log('****************************************************');
-console.log('*                Avance inválido                   *');
-console.log('****************************************************');
+console.log('===== Avance inválido =====');
 console.log('');
 console.log('Resultado:', progressTest.advance(0, 5));
 console.log('Temporada:', progressTest.currentSeason);
 console.log('Episodio:', progressTest.currentEpisode);
 
 console.log('');
-console.log('****************************************************');
-console.log('*                Avance inválido                   *');
-console.log('****************************************************');
+console.log('===== Avance inválido =====');
 console.log('');
 console.log('Resultado:', progressTest.advance(5, -2));
 console.log('Temporada:', progressTest.currentSeason);
 console.log('Episodio:', progressTest.currentEpisode);
 console.log('');
 
-console.log('****************************************************');
-console.log('*                       Reset                      *');
-console.log('****************************************************');
+console.log('===== Reset =====');
 console.log('');
 progressTest.reset();
 console.log('Temporada:', progressTest.currentSeason);
@@ -918,17 +907,18 @@ console.log('¿Ha comenzado?:', progressTest.hasStarted);
 // =============================================================================
 // PRUEBAS — ETAPA 3
 // =============================================================================
+
 console.log('');
 console.log('');
-console.log('===== PRUEBAS ETAPA 3: CLASE SHOWLIST =====');
+console.log('****************************************************');
+console.log('****       PRUEBAS ETAPA 3: CLASE SHOWLIST     ****');
+console.log('****************************************************');
 console.log('');
 console.log('');
 
 const myShowList = new ShowList();
 
-console.log('****************************************************');
-console.log('*                Verificación inicial              *');
-console.log('****************************************************');
+console.log('===== Verificación inicial =====');
 console.log('');
 
 console.log('Número de series inicial:', myShowList.entries.length);
@@ -937,9 +927,7 @@ console.log('Número de objetos Show:', myShowList.shows.length);
 myShowList.showList();
 
 console.log('');
-console.log('****************************************************');
-console.log('*                  Añadir series                   *');
-console.log('****************************************************');
+console.log('===== Añadir series =====');
 console.log('');
 
 console.log('Añadir Breaking Bad:', myShowList.addShow(breakingBad));
@@ -951,9 +939,7 @@ console.log('Número de series:', myShowList.entries.length);
 console.log('Número de objetos Show:', myShowList.shows.length);
 
 console.log('');
-console.log('****************************************************');
-console.log('*                 Añadir serie duplicada            *');
-console.log('****************************************************');
+console.log('===== Añadir serie duplicada =====');
 console.log('');
 
 console.log('Añadir Breaking Bad otra vez:', myShowList.addShow(breakingBad));
@@ -962,9 +948,7 @@ console.log('');
 console.log('Número de series:', myShowList.entries.length);
 
 console.log('');
-console.log('****************************************************');
-console.log('*                  Añadir serie inválida            *');
-console.log('****************************************************');
+console.log('===== Añadir serie inválida =====');
 console.log('');
 
 console.log('Añadir objeto incorrecto:', myShowList.addShow({ name: 'Serie falsa' }));
@@ -973,17 +957,13 @@ console.log('');
 console.log('Número de series:', myShowList.entries.length);
 
 console.log('');
-console.log('****************************************************');
-console.log('*                 Mostrar lista de series           *');
-console.log('****************************************************');
+console.log('===== Mostrar lista de series =====');
 console.log('');
 
 myShowList.showList();
 
 console.log('');
-console.log('****************************************************');
-console.log('*                   Actualizar progreso             *');
-console.log('****************************************************');
+console.log('===== Actualizar progreso =====');
 console.log('');
 
 // Busca la serie Breaking Bad para modificar su progreso.
@@ -997,9 +977,7 @@ console.log('');
 myShowList.showList();
 
 console.log('');
-console.log('****************************************************');
-console.log('*                  Reiniciar progreso               *');
-console.log('****************************************************');
+console.log('===== Reiniciar progreso =====');
 console.log('');
 
 console.log('Reiniciar Breaking Bad:', myShowList.resetProgress(breakingBad.id));
@@ -1008,17 +986,13 @@ console.log('');
 myShowList.showList();
 
 console.log('');
-console.log('****************************************************');
-console.log('*               Reiniciar serie inexistente         *');
-console.log('****************************************************');
+console.log('===== Reiniciar serie inexistente =====');
 console.log('');
 
 console.log('Reiniciar serie inexistente:', myShowList.resetProgress(99999));
 
 console.log('');
-console.log('****************************************************');
-console.log('*                  Eliminar serie                   *');
-console.log('****************************************************');
+console.log('===== Eliminar serie =====');
 console.log('');
 
 console.log('Eliminar Game of Thrones:', myShowList.removeShow(gameOfThrones.id));
@@ -1028,9 +1002,7 @@ console.log('Número de series:', myShowList.entries.length);
 myShowList.showList();
 
 console.log('');
-console.log('****************************************************');
-console.log('*              Eliminar serie inexistente           *');
-console.log('****************************************************');
+console.log('===== Eliminar serie inexistente =====');
 console.log('');
 
 console.log('Eliminar serie inexistente:', myShowList.removeShow(99999));
@@ -1039,9 +1011,7 @@ console.log('');
 console.log('Número de series:', myShowList.entries.length);
 
 console.log('');
-console.log('****************************************************');
-console.log('*                 Verificación lista vacía          *');
-console.log('****************************************************');
+console.log('===== Verificación lista vacía =====');
 console.log('');
 
 const emptyShowList = new ShowList();
@@ -1057,9 +1027,12 @@ console.log('Número de objetos Show:', emptyShowList.shows.length);
 // =============================================================================
 // PRUEBAS — ETAPA 4
 // =============================================================================
+
 console.log('');
 console.log('');
-console.log('===== PRUEBAS ETAPA 4: MÉTODOS DE SHOWLIST =====');
+console.log('****************************************************');
+console.log('****      PRUEBAS ETAPA 4: MÉTODOS DE SHOWLIST ****');
+console.log('****************************************************');
 console.log('');
 console.log('');
 
@@ -1074,9 +1047,7 @@ showListTest.addMultipleShows(
   proyectoAurora
 );
 
-console.log('****************************************************');
-console.log('*                Añadir varias series              *');
-console.log('****************************************************');
+console.log('===== Añadir varias series =====');
 console.log('');
 
 console.log(
@@ -1087,9 +1058,7 @@ console.log(
 console.log('Número total de series:', showListTest.entries.length);
 
 console.log('');
-console.log('****************************************************');
-console.log('*               Filtrar por valoración             *');
-console.log('****************************************************');
+console.log('===== Filtrar por valoración =====');
 console.log('');
 
 console.log('Series con valoración entre 8 y 10:');
@@ -1104,9 +1073,7 @@ console.log('');
 console.log('Número de series encontradas:', showsByRating.length);
 
 console.log('');
-console.log('****************************************************');
-console.log('*               Filtrar con rango inválido          *');
-console.log('****************************************************');
+console.log('===== Filtrar con rango inválido =====');
 console.log('');
 
 console.log(
@@ -1125,9 +1092,7 @@ console.log(
 );
 
 console.log('');
-console.log('****************************************************');
-console.log('*              Ordenar por popularidad              *');
-console.log('****************************************************');
+console.log('===== Ordenar por popularidad =====');
 console.log('');
 
 console.log('Series ordenadas por popularidad:');
@@ -1143,9 +1108,7 @@ showsByPopularity.forEach(showEntry => {
 });
 
 console.log('');
-console.log('****************************************************');
-console.log('*           Comprobar que la lista no cambia        *');
-console.log('****************************************************');
+console.log('===== Comprobar que la lista no cambia =====');
 console.log('');
 
 console.log('Orden original de la lista:');
@@ -1166,14 +1129,17 @@ showsByPopularity.forEach(showEntry => {
 // =============================================================================
 // PRUEBAS — ETAPA 5
 // =============================================================================
-console.log('');
-console.log('');
-console.log('===== PRUEBAS ETAPA 5: RECURSIVIDAD =====');
+
 console.log('');
 console.log('');
 console.log('****************************************************');
-console.log('*             Búsqueda de episodio existente        *');
+console.log('****         PRUEBAS ETAPA 5: RECURSIVIDAD     ****');
 console.log('****************************************************');
+console.log('');
+console.log('');
+
+
+console.log('===== Búsqueda de episodio existente =====');
 console.log('');
 
 const episodeFound = findEpisodeByNumber(breakingBad.episodes, 1, 2);
@@ -1181,9 +1147,7 @@ const episodeFound = findEpisodeByNumber(breakingBad.episodes, 1, 2);
 console.log('Episodio encontrado:', episodeFound);
 
 console.log('');
-console.log('****************************************************');
-console.log('*             Búsqueda de episodio inexistente      *');
-console.log('****************************************************');
+console.log('===== Búsqueda de episodio inexistente =====');
 console.log('');
 
 const episodeNotFound = findEpisodeByNumber(breakingBad.episodes, 5, 1);
@@ -1191,9 +1155,7 @@ const episodeNotFound = findEpisodeByNumber(breakingBad.episodes, 5, 1);
 console.log('Episodio encontrado:', episodeNotFound);
 
 console.log('');
-console.log('****************************************************');
-console.log('*              Búsqueda con datos inválidos         *');
-console.log('****************************************************');
+console.log('===== Búsqueda con datos inválidos =====');
 console.log('');
 
 console.log(
@@ -1212,9 +1174,7 @@ console.log(
 );
 
 console.log('');
-console.log('****************************************************');
-console.log('*              Avance automático del progreso       *');
-console.log('****************************************************');
+console.log('===== Avance automático del progreso =====');
 console.log('');
 
 const episodeTestList = new ShowList();
@@ -1238,9 +1198,7 @@ console.log('Temporada:', episodeTestList.entries[0].progress.currentSeason);
 console.log('Episodio:', episodeTestList.entries[0].progress.currentEpisode);
 
 console.log('');
-console.log('****************************************************');
-console.log('*             Cambio de temporada                  *');
-console.log('****************************************************');
+console.log('===== Cambio de temporada =====');
 console.log('');
 
 // Avanza hasta completar T1E3.
@@ -1254,9 +1212,7 @@ console.log('Temporada:', episodeTestList.entries[0].progress.currentSeason);
 console.log('Episodio:', episodeTestList.entries[0].progress.currentEpisode);
 
 console.log('');
-console.log('****************************************************');
-console.log('*              Serie terminada                     *');
-console.log('****************************************************');
+console.log('===== Serie terminada =====');
 console.log('');
 
 // Avanza hasta completar T2E2.
@@ -1270,9 +1226,7 @@ console.log('Temporada:', episodeTestList.entries[0].progress.currentSeason);
 console.log('Episodio:', episodeTestList.entries[0].progress.currentEpisode);
 
 console.log('');
-console.log('****************************************************');
-console.log('*              Serie inexistente                   *');
-console.log('****************************************************');
+console.log('===== Serie inexistente =====');
 console.log('');
 
 console.log('Resultado:', episodeTestList.markEpisodeWatched(99999));
