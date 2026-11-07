@@ -161,6 +161,16 @@ class Progress {
 
   // ── Getters y setters ────────────────────────────────────────────────────
 
+  /** Getter que indica si se ha comenzado a ver la serie.
+  *  @returns {true|false} Devuelve True si se ha comenzado a ver la serie. 
+  */
+  get hasStarted() {
+    return this.currentSeason > 0 && this.currentEpisode > 0;
+  }
+
+
+  // ── Métodos ───────────────────────────────────────────────────────────────
+
   /**
    * Marca como último visto el episodio indicado.
    * Devuelve true si se ha actualizado el progreso.
@@ -187,12 +197,6 @@ class Progress {
     this.currentEpisode = 0;
   }
 
-  /** Getter que indica si se ha comenzado a ver la serie.
-  *  @returns {true|false} Devuelve True si se ha comenzado a ver la serie. 
-  */
-  get hasStarted() {
-    return this.currentSeason > 0 && this.currentEpisode > 0;
-  }
 }
 
 
@@ -202,43 +206,177 @@ class Progress {
    ============================================================================= */
 
 class ShowList {
-  constructor() {
-    // ...
-  }
 
-  // get entries()  → copia del array de pares { show, progress }
-
-  // get shows()    → array nuevo solo con los objetos Show
+  // Array privado que almacena las series junto con su progreso.
+  #showEntries = [];
 
   /**
-   * Añade una serie creando su Progress inicial.
-   * Devuelve true si se ha añadido.
+   * Constructor de la clase ShowList.
+   * Inicializa una lista vacía de series.
+   */
+  constructor() {
+    this.#showEntries = [];
+  }
+
+    // ── Getters y setters ────────────────────────────────────────────────────
+
+  /**
+   * Getter que devuelve una copia del array de series y sus progresos.
+   * @returns {Array} Devuelve un array de pares { show, progress }.
+   */
+  get entries() {
+    return this.#showEntries.map(showEntry => ({
+      show: showEntry.show,
+      progress: showEntry.progress
+    }));
+  }
+
+  
+  /**
+   * Getter que devuelve un array nuevo con los objetos Show.
+   * @returns {Array<Show>} Devuelve un array con las series de la lista.
+   */
+  get shows() {
+    return this.#showEntries.map(showEntry => showEntry.show);
+  }
+
+
+
+  // ── Métodos ───────────────────────────────────────────────────────────────
+
+  /**
+   * Añade una serie a la lista y crea su progreso inicial.
+   * No permite añadir objetos que no sean de la clase Show ni series duplicadas.
+   * @param {Show} show Objeto de la serie que se quiere añadir.
+   * @returns {boolean} Devuelve true si se ha añadido correctamente.
    */
   addShow(show) {
-    // ...
+
+    // Comprueba que el objeto recibido pertenece a la clase Show.
+    if (!(show instanceof Show)) {
+      console.warn('ShowList: solo se pueden añadir objetos de la clase Show.');
+      return false;
+    }
+
+    // Comprueba si la serie ya está incluida en la lista.
+    const showAlreadyExists = this.#showEntries.some(
+      showEntry => showEntry.show.id === show.id
+    );
+
+    if (showAlreadyExists) {
+      console.warn('ShowList: la serie ya está en la lista.');
+      return false;
+    }
+
+    // Crea el progreso inicial de la serie.
+    const showProgress = new Progress(show.id);
+
+    // Añade la serie junto con su progreso.
+    this.#showEntries.push({
+      show: show,
+      progress: showProgress
+    });
+
+    return true;
   }
 
   /**
    * Elimina una serie (y su progreso) por su id.
-   * Devuelve true si se ha eliminado.
+   * @param {number} showId Identificador de la serie que se quiere eliminar.
+   * @returns {boolean} Devuelve true si se ha eliminado correctamente.
    */
   removeShow(showId) {
-    // ...
+
+    // Busca la posición de la serie dentro del array.
+    const showIndex = this.#showEntries.findIndex(
+      showEntry => showEntry.show.id === showId
+    );
+
+    // Comprueba si la serie existe.
+    if (showIndex === -1) {
+      console.warn('ShowList: no existe ninguna serie con ese ID.');
+      return false;
+    }
+
+    // Crea un array nuevo sin la serie que queremos eliminar.
+    const updatedShowEntries = [];
+    
+    for (let i = 0; i < this.#showEntries.length; i++) {
+      if (i !== showIndex) {
+        updatedShowEntries.push(this.#showEntries[i]);
+      }
+    }
+
+    // Actualiza el array de series.
+    this.#showEntries = updatedShowEntries;
+
+    return true;
   }
 
   /**
    * Reinicia el progreso de una serie de la lista.
-   * Devuelve true si se ha reiniciado.
+   * @param {number} showId Identificador de la serie cuyo progreso se quiere reiniciar.
+   * @returns {boolean} Devuelve true si se ha reiniciado correctamente.
    */
   resetProgress(showId) {
-    // ...
+
+    // Busca la serie dentro de la lista.
+    const showEntry = this.#showEntries.find(
+      showEntry => showEntry.show.id === showId
+    );
+
+    // Comprueba si la serie existe.
+    if (showEntry === undefined) {
+      console.warn('ShowList: no existe ninguna serie con ese ID.');
+      return false;
+    }
+
+    // Reinicia el progreso de la serie.
+    showEntry.progress.reset();
+
+    return true;
   }
 
-  /**
-   * Muestra por consola nombre, tipo, valoración y progreso de cada serie.
+   /**
+   * Muestra por consola el nombre, tipo, valoración y progreso de cada serie.
+   * Si la lista está vacía, muestra un mensaje informativo.
    */
   showList() {
-    // ...
+
+    // Comprueba si la lista está vacía.
+    if (this.#showEntries.length === 0) {
+      console.log('La lista de series está vacía.');
+      return;
+    }
+
+    // Recorre las series y muestra su información.
+    this.#showEntries.forEach(showEntry => {
+
+      const currentShow = showEntry.show;
+      const showProgress = showEntry.progress;
+
+      // Prepara el texto de la valoración.
+      let ratingDisplay;
+
+      if (currentShow.rating === null) {
+        ratingDisplay = 'Sin valoración';
+      } else {
+        ratingDisplay = currentShow.rating;
+      }
+
+      // Prepara el texto del progreso.
+      let progressDisplay;
+
+      if (showProgress.hasStarted) {
+        progressDisplay = `T${showProgress.currentSeason}E${showProgress.currentEpisode}`;
+      } else {
+        progressDisplay = 'Sin empezar';
+      }
+
+      console.log(
+        `Nombre: ${currentShow.name} | Tipo: ${currentShow.type} | Rating: ${ratingDisplay} | Progreso: ${progressDisplay}`
+      );
+    });
   }
 
   /* ===========================================================================
@@ -581,7 +719,8 @@ console.log('Episodios de serie invalido en el Constructor:', invalidShow.episod
 // =============================================================================
 // PRUEBAS — ETAPA 2
 // =============================================================================
-
+console.log('');
+console.log('');
 console.log('===== PRUEBAS ETAPA 2: CLASE PROGRESS =====');
 console.log('');
 console.log('');
@@ -635,3 +774,142 @@ progressTest.reset();
 console.log('Temporada:', progressTest.currentSeason);
 console.log('Episodio:', progressTest.currentEpisode);
 console.log('¿Ha comenzado?:', progressTest.hasStarted);
+
+
+
+// =============================================================================
+// PRUEBAS — ETAPA 3
+// =============================================================================
+console.log('');
+console.log('');
+console.log('===== PRUEBAS ETAPA 3: CLASE SHOWLIST =====');
+console.log('');
+console.log('');
+
+const myShowList = new ShowList();
+
+console.log('****************************************************');
+console.log('*                Verificación inicial              *');
+console.log('****************************************************');
+console.log('');
+
+console.log('Número de series inicial:', myShowList.entries.length);
+console.log('Número de objetos Show:', myShowList.shows.length);
+
+myShowList.showList();
+
+console.log('');
+console.log('****************************************************');
+console.log('*                  Añadir series                   *');
+console.log('****************************************************');
+console.log('');
+
+console.log('Añadir Breaking Bad:', myShowList.addShow(breakingBad));
+console.log('Añadir Game of Thrones:', myShowList.addShow(gameOfThrones));
+console.log('Añadir Stranger Things:', myShowList.addShow(strangerThings));
+
+console.log('');
+console.log('Número de series:', myShowList.entries.length);
+console.log('Número de objetos Show:', myShowList.shows.length);
+
+console.log('');
+console.log('****************************************************');
+console.log('*                 Añadir serie duplicada            *');
+console.log('****************************************************');
+console.log('');
+
+console.log('Añadir Breaking Bad otra vez:', myShowList.addShow(breakingBad));
+
+console.log('');
+console.log('Número de series:', myShowList.entries.length);
+
+console.log('');
+console.log('****************************************************');
+console.log('*                  Añadir serie inválida            *');
+console.log('****************************************************');
+console.log('');
+
+console.log('Añadir objeto incorrecto:', myShowList.addShow({ name: 'Serie falsa' }));
+
+console.log('');
+console.log('Número de series:', myShowList.entries.length);
+
+console.log('');
+console.log('****************************************************');
+console.log('*                 Mostrar lista de series           *');
+console.log('****************************************************');
+console.log('');
+
+myShowList.showList();
+
+console.log('');
+console.log('****************************************************');
+console.log('*                   Actualizar progreso             *');
+console.log('****************************************************');
+console.log('');
+
+// Busca la serie Breaking Bad para modificar su progreso.
+const breakingBadEntry = myShowList.entries.find(
+  showEntry => showEntry.show.id === breakingBad.id
+);
+
+console.log('Avanzar Breaking Bad:', breakingBadEntry.progress.advance(2, 5));
+
+console.log('');
+myShowList.showList();
+
+console.log('');
+console.log('****************************************************');
+console.log('*                  Reiniciar progreso               *');
+console.log('****************************************************');
+console.log('');
+
+console.log('Reiniciar Breaking Bad:', myShowList.resetProgress(breakingBad.id));
+
+console.log('');
+myShowList.showList();
+
+console.log('');
+console.log('****************************************************');
+console.log('*               Reiniciar serie inexistente         *');
+console.log('****************************************************');
+console.log('');
+
+console.log('Reiniciar serie inexistente:', myShowList.resetProgress(99999));
+
+console.log('');
+console.log('****************************************************');
+console.log('*                  Eliminar serie                   *');
+console.log('****************************************************');
+console.log('');
+
+console.log('Eliminar Game of Thrones:', myShowList.removeShow(gameOfThrones.id));
+
+console.log('');
+console.log('Número de series:', myShowList.entries.length);
+myShowList.showList();
+
+console.log('');
+console.log('****************************************************');
+console.log('*              Eliminar serie inexistente           *');
+console.log('****************************************************');
+console.log('');
+
+console.log('Eliminar serie inexistente:', myShowList.removeShow(99999));
+
+console.log('');
+console.log('Número de series:', myShowList.entries.length);
+
+console.log('');
+console.log('****************************************************');
+console.log('*                 Verificación lista vacía          *');
+console.log('****************************************************');
+console.log('');
+
+const emptyShowList = new ShowList();
+
+emptyShowList.showList();
+
+console.log('');
+console.log('Número de series:', emptyShowList.entries.length);
+console.log('Número de objetos Show:', emptyShowList.shows.length);
