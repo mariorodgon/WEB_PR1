@@ -577,6 +577,7 @@ console.log('Géneros de serie invalido en el Constructor:', invalidShow.genres)
 console.log('Episodios de serie invalido en el Constructor:', invalidShow.episodes);
 
 
+
 // =============================================================================
 // PRUEBAS — ETAPA 2
 // =============================================================================
@@ -596,7 +597,6 @@ console.log('ID de serie:', progressTest.showId);
 console.log('Temporada inicial:', progressTest.currentSeason);
 console.log('Episodio inicial:', progressTest.currentEpisode);
 console.log('¿Ha comenzado?:', progressTest.hasStarted);
-
 
 console.log('');
 console.log('****************************************************');
