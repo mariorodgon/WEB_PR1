@@ -98,7 +98,6 @@ class Show {
 
   // ── Getters y setters ────────────────────────────────────────────────────
 
-  // get rating() / set rating(newRating)
 
 /** 
  * Getter para el valor de rating
@@ -128,7 +127,6 @@ class Show {
     }
   }
  
-  // get platform()
   /** 
    * Getter para el valor de platform (cadena o plataforma de emisión).
    * @returns {string|null} Devuelve el nombre de cadena o, si no hay, de plataforma;
@@ -156,25 +154,45 @@ class Show {
 
 class Progress {
   constructor(showId) {
-    // ...
+    this.showId = showId;
+    this.currentSeason = 0;
+    this.currentEpisode = 0;
   }
+
+  // ── Getters y setters ────────────────────────────────────────────────────
 
   /**
    * Marca como último visto el episodio indicado.
    * Devuelve true si se ha actualizado el progreso.
    */
   advance(season, number) {
-    // ...
+    // Ambos valores deben ser enteros positivos.
+    if (season <= 0 || number <= 0 ||
+    !Number.isInteger(season) || !Number.isInteger(number)) {
+    console.warn('La temporada y el episodio deben ser números enteros positivos.');
+    return false;
+    }
+
+    this.currentSeason = season;
+    this.currentEpisode = number;
+
+    return true;
   }
 
   /**
    * Vuelve el progreso a 0 / 0 (sin empezar).
    */
   reset() {
-    // ...
+    this.currentSeason = 0;
+    this.currentEpisode = 0;
   }
 
-  // get hasStarted()
+  /** Getter que indica si se ha comenzado a ver la serie.
+  *  @returns {true|false} Devuelve True si se ha comenzado a ver la serie. 
+  */
+  get hasStarted() {
+    return this.currentSeason > 0 && this.currentEpisode > 0;
+  }
 }
 
 
@@ -559,3 +577,61 @@ console.log('Géneros de serie invalido en el Constructor:', invalidShow.genres)
 console.log('Episodios de serie invalido en el Constructor:', invalidShow.episodes);
 
 
+// =============================================================================
+// PRUEBAS — ETAPA 2
+// =============================================================================
+
+console.log('===== PRUEBAS ETAPA 2: CLASE PROGRESS =====');
+console.log('');
+console.log('');
+
+console.log('****************************************************');
+console.log('*                Verificación inicial              *');
+console.log('****************************************************');
+console.log('');
+
+const progressTest = new Progress(breakingBad.id);
+
+console.log('ID de serie:', progressTest.showId);
+console.log('Temporada inicial:', progressTest.currentSeason);
+console.log('Episodio inicial:', progressTest.currentEpisode);
+console.log('¿Ha comenzado?:', progressTest.hasStarted);
+
+
+console.log('');
+console.log('****************************************************');
+console.log('*                Avance válido                     *');
+console.log('****************************************************');
+console.log('');
+console.log('Resultado:', progressTest.advance(1, 3));
+console.log('Temporada:', progressTest.currentSeason);
+console.log('Episodio:', progressTest.currentEpisode);
+console.log('¿Ha comenzado?:', progressTest.hasStarted);
+
+console.log('');
+console.log('****************************************************');
+console.log('*                Avance inválido                   *');
+console.log('****************************************************');
+console.log('');
+console.log('Resultado:', progressTest.advance(0, 5));
+console.log('Temporada:', progressTest.currentSeason);
+console.log('Episodio:', progressTest.currentEpisode);
+
+console.log('');
+console.log('****************************************************');
+console.log('*                Avance inválido                   *');
+console.log('****************************************************');
+console.log('');
+console.log('Resultado:', progressTest.advance(5, -2));
+console.log('Temporada:', progressTest.currentSeason);
+console.log('Episodio:', progressTest.currentEpisode);
+console.log('');
+
+console.log('****************************************************');
+console.log('*                       Reset                      *');
+console.log('****************************************************');
+console.log('');
+progressTest.reset();
+console.log('Temporada:', progressTest.currentSeason);
+console.log('Episodio:', progressTest.currentEpisode);
+console.log('¿Ha comenzado?:', progressTest.hasStarted);
