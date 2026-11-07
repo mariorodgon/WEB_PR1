@@ -377,7 +377,7 @@ class ShowList {
         `Nombre: ${currentShow.name} | Tipo: ${currentShow.type} | Rating: ${ratingDisplay} | Progreso: ${progressDisplay}`
       );
     });
-  }
+  };
 
   /* ===========================================================================
      ETAPA 4 — Funciones flecha dentro de ShowList (2 puntos)
@@ -385,10 +385,25 @@ class ShowList {
 
   /**
    * Añade varias series a la vez (operador rest).
-   * Devuelve el número de series añadidas realmente.
+   * Utiliza el método addShow() para comprobar cada serie antes de añadirla.
+   * @param {...Show} shows Series que se quieren añadir.
+   * @returns {number} Devuelve el número de series añadidas correctamente.
    */
   addMultipleShows = (...shows) => {
-    // ...
+
+    // Contador de series añadidas.
+    let addedShows = 0;
+
+    // Recorre las series recibidas.
+    for (const show of shows) {
+
+      // Intenta añadir cada serie a la lista.
+      if (this.addShow(show)) {
+        addedShows++;
+      }
+    }
+
+    return addedShows;
   };
 
   /**
@@ -402,11 +417,41 @@ class ShowList {
   /**
    * Devuelve los pares { show, progress } ordenados por weight (de mayor a
    * menor) sin modificar la lista original.
+   * Excluye las series que no tienen valoración.
+   * @param {number} minRating Valoración mínima.
+   * @param {number} maxRating Valoración máxima.
+   * @returns {Array} Devuelve un array nuevo con los pares { show, progress }.
    */
-  sortShowsByPopularity = () => {
-    // ...
+  getShowsByRatingRange = (minRating, maxRating) => {
+
+    // Comprueba que las valoraciones sean números entre 0 y 10.
+    if (
+      typeof minRating !== 'number' || !Number.isFinite(minRating) || minRating < 0 || minRating > 10 ||
+      typeof maxRating !== 'number' || !Number.isFinite(maxRating) || maxRating < 0 || maxRating > 10 ||
+      minRating > maxRating
+    ) {
+      console.warn('ShowList: el rango de valoraciones no es válido.');
+      return [];
+    }
+
+    // Devuelve las series cuya valoración está dentro del rango.
+    return this.#showEntries.filter(showEntry => {
+      const rating = showEntry.show.rating;
+      // Comprueba que la serie tenga valoración.
+      if (rating === null) {
+        return false;
+      }
+
+      // Comprueba que la valoración esté dentro del rango.
+      if (rating >= minRating && rating <= maxRating) {
+        return true;
+      }
+      
+      return false;
+    });
   };
 
+  
   /* ===========================================================================
      ETAPA 5.2 — markEpisodeWatched (forma parte de la etapa 5)
      =========================================================================== */
@@ -913,3 +958,114 @@ emptyShowList.showList();
 console.log('');
 console.log('Número de series:', emptyShowList.entries.length);
 console.log('Número de objetos Show:', emptyShowList.shows.length);
+
+
+
+// =============================================================================
+// PRUEBAS — ETAPA 4
+// =============================================================================
+console.log('');
+console.log('');
+console.log('===== PRUEBAS ETAPA 4: MÉTODOS DE SHOWLIST =====');
+console.log('');
+console.log('');
+
+const showListTest = new ShowList();
+
+showListTest.addMultipleShows(
+  breakingBad,
+  gameOfThrones,
+  strangerThings,
+  theLastOfUs,
+  severance,
+  proyectoAurora
+);
+
+console.log('****************************************************');
+console.log('*                Añadir varias series              *');
+console.log('****************************************************');
+console.log('');
+
+console.log(
+  'Series añadidas:',
+  showListTest.addMultipleShows(breakingBad, gameOfThrones)
+);
+
+console.log('Número total de series:', showListTest.entries.length);
+
+console.log('');
+console.log('****************************************************');
+console.log('*               Filtrar por valoración             *');
+console.log('****************************************************');
+console.log('');
+
+console.log('Series con valoración entre 8 y 10:');
+
+const showsByRating = showListTest.getShowsByRatingRange(8, 10);
+
+showsByRating.forEach(showEntry => {
+  console.log(showEntry.show.name, '-', showEntry.show.rating);
+});
+
+console.log('');
+console.log('Número de series encontradas:', showsByRating.length);
+
+console.log('');
+console.log('****************************************************');
+console.log('*               Filtrar con rango inválido          *');
+console.log('****************************************************');
+console.log('');
+
+console.log(
+  'Resultado con rango 9 - 5:',
+  showListTest.getShowsByRatingRange(9, 5)
+);
+
+console.log(
+  'Resultado con rango -1 - 5:',
+  showListTest.getShowsByRatingRange(-1, 5)
+);
+
+console.log(
+  'Resultado con rango 5 - 11:',
+  showListTest.getShowsByRatingRange(5, 11)
+);
+
+console.log('');
+console.log('****************************************************');
+console.log('*              Ordenar por popularidad              *');
+console.log('****************************************************');
+console.log('');
+
+console.log('Series ordenadas por popularidad:');
+
+const showsByPopularity = showListTest.sortShowsByPopularity();
+
+showsByPopularity.forEach(showEntry => {
+  console.log(
+    showEntry.show.name,
+    '- Popularidad:',
+    showEntry.show.weight
+  );
+});
+
+console.log('');
+console.log('****************************************************');
+console.log('*           Comprobar que la lista no cambia        *');
+console.log('****************************************************');
+console.log('');
+
+console.log('Orden original de la lista:');
+
+showListTest.entries.forEach(showEntry => {
+  console.log(showEntry.show.name);
+});
+
+console.log('');
+console.log('Orden devuelto por popularidad:');
+
+showsByPopularity.forEach(showEntry => {
+  console.log(showEntry.show.name);
+});
+
+
