@@ -548,12 +548,68 @@ const findEpisodeByNumber = (episodes, season, number, index = 0) => {
    ETAPA 6 — Uso de reduce (4 puntos)
    ============================================================================= */
 
+
+
 /**
- * Devuelve { genre, count } con el género más frecuente del array de series.
+ * Busca el género más frecuente entre todas las series.
+ * @param {Array<Show>} shows Array de series que queremos analizar.
+ * @returns {{genre: string, count: number}|null} Devuelve el género más frecuente y sus apariciones, o null.
  */
 const getMostCommonGenre = (shows) => {
-  // ...
+
+  // Comprueba que se ha recibido un array con elementos.
+  if (!Array.isArray(shows) || shows.length === 0) {
+    return null;
+  }
+
+  // Cuenta las apariciones de cada género.
+  const genreCounts = shows.reduce((counts, show) => {
+
+    show.genres.forEach(genre => {
+
+      if (counts[genre] === undefined) {
+        counts[genre] = 1;
+      } else {
+        counts[genre]++;
+      }
+
+    });
+
+    return counts;
+
+  }, {});
+
+  // Obtiene los géneros encontrados.
+  const genres = Object.keys(genreCounts);
+
+  if (genres.length === 0) {
+    return null;
+  }
+
+  // Busca el género más frecuente.
+  const mostCommonGenre = genres.reduce((mostCommon, genre) => {
+
+    if (genreCounts[genre] > genreCounts[mostCommon]) {
+      return genre;
+    }
+
+    if (
+      genreCounts[genre] === genreCounts[mostCommon] &&
+      genre.localeCompare(mostCommon) < 0
+    ) {
+      return genre;
+    }
+
+    return mostCommon;
+
+  });
+
+  return {
+    genre: mostCommonGenre,
+    count: genreCounts[mostCommonGenre]
+  };
 };
+
 
 
 /* =============================================================================
@@ -1230,3 +1286,31 @@ console.log('===== Serie inexistente =====');
 console.log('');
 
 console.log('Resultado:', episodeTestList.markEpisodeWatched(99999));
+
+// =============================================================================
+// PRUEBAS — ETAPA 6
+// =============================================================================
+
+console.log('');
+console.log('');
+console.log('****************************************************');
+console.log('****         PRUEBAS ETAPA 6: REDUCE           ****');
+console.log('****************************************************');
+console.log('');
+console.log('');
+
+
+console.log('===== Género más frecuente =====');
+console.log('');
+
+const mostCommonGenre = getMostCommonGenre(showListTest.shows);
+
+console.log('Género más frecuente:', mostCommonGenre);
+
+console.log('');
+console.log('===== Validación de datos =====');
+console.log('');
+
+console.log('Array inválido:', getMostCommonGenre(null));
+console.log('Array vacío:', getMostCommonGenre([]));
+console.log('Series sin géneros:', getMostCommonGenre([invalidShow]));
