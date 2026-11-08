@@ -618,10 +618,50 @@ const getMostCommonGenre = (shows) => {
 
 /**
  * Muestra la información principal de una serie y devuelve una copia
- * con el campo following: true.
+ * del objeto con el campo adicional following.
+ * @param {Show} show Serie de la que queremos obtener la información.
+ * @returns {Object|null} Devuelve una copia de la serie o null si no es válida.
  */
 const getShowInfo = (show) => {
-  // ...
+
+  // Comprobación del parametro recibido.
+  if (!(show instanceof Show)) {
+    console.warn('getShowInfo: el parámetro no es un objeto Show.');
+    return null;
+  }
+
+  // Extraemos las propiedades de la serie recibida.
+  const {name, type, rating, genres = [], network = {}, webChannel = {}} = show;
+
+  // Extraemos el nombre de la cadena y de la plataforma.
+  const { name: networkName } = network || {};
+  const { name: webChannelName } = webChannel || {};
+
+  // Obtenemos el primer género.
+  let firstGenre = 'Sin género';
+  if (genres.length > 0) {firstGenre = genres[0];}
+
+  // Obtenemos la valoración.
+  let ratingInfo = rating;
+  if (rating === null) {ratingInfo = 'Sin valorar';}
+
+  // Obtenemos el nombre de la plataforma disponible.
+  let platformName = 'Desconocida';
+  if (networkName) {platformName = networkName;} 
+  else if (webChannelName) {platformName = webChannelName;}
+
+  // Mostramos la información por consola.
+  console.log('===== Información de la serie =====');
+  console.log('Título:', name);
+  console.log('Tipo:', type);
+  console.log('Valoración:', ratingInfo);
+  console.log('Primer Género:', firstGenre);
+  console.log('Cadena / Plataforma:', platformName);
+
+  // Creamos una copia de la serie añadiendo los campos adicionales.
+  const showInfo = { ...show, rating: rating, following: true};
+
+  return showInfo;
 };
 
 
@@ -1314,3 +1354,40 @@ console.log('');
 console.log('Array inválido:', getMostCommonGenre(null));
 console.log('Array vacío:', getMostCommonGenre([]));
 console.log('Series sin géneros:', getMostCommonGenre([invalidShow]));
+
+
+
+console.log('');
+console.log('');
+console.log('****************************************************');
+console.log('****   PRUEBAS ETAPA 7: DESTRUCTURING Y SPREAD  ****');
+console.log('****************************************************');
+console.log('');
+console.log('');
+
+
+const breakingBadInfo = getShowInfo(breakingBad);
+
+console.log('');
+console.log('===== Comprobación de la copia =====');
+console.log('La original tiene following:', breakingBad.following !== undefined);
+console.log('La copia tiene following:', breakingBadInfo.following);
+console.log('La valoración se conserva:', breakingBadInfo.rating);
+console.log('-------------------------------------');
+
+console.log('');
+const proyectoAuroraInfo = getShowInfo(proyectoAurora);
+console.log('');
+console.log('===== Comprobación de la copia =====');
+console.log('La original tiene following:', proyectoAurora.following !== undefined);
+console.log('La copia tiene following:', proyectoAuroraInfo.following);
+console.log('La valoración se conserva:', proyectoAuroraInfo.rating);
+
+console.log('');
+console.log('===== Validación de datos =====');
+console.log('');
+
+console.log('Objeto inválido (null):', getShowInfo(null));
+console.log('Objeto inválido (Number):', getShowInfo(Number));
+console.log('');
+console.log('Objeto válido (theLastOfUs):', getShowInfo(theLastOfUs) !== null);
