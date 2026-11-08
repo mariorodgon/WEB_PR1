@@ -1391,3 +1391,12 @@ console.log('Objeto inválido (null):', getShowInfo(null));
 console.log('Objeto inválido (Number):', getShowInfo(Number));
 console.log('');
 console.log('Objeto válido (theLastOfUs):', getShowInfo(theLastOfUs) !== null);
+
+
+console.log('');
+console.log('');
+console.log('****************************************************');
+console.log('****      PRUEBAS ETAPA 8: MANEJO DE FECHAS     ****');
+console.log('****************************************************');
+console.log('');
+console.log('');
