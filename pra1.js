@@ -670,46 +670,96 @@ const getShowInfo = (show) => {
    ============================================================================= */
 
 /**
- * Días naturales que faltan desde today hasta isoDate (aaaa-mm-dd).
+ * Calcula los días naturales que faltan hasta una fecha.
+ * @param {string} isoDate Fecha en formato aaaa-mm-dd.
+ * @param {Date} today Fecha desde la que se calcula la diferencia.
+ * @returns {number|null} Devuelve los días restantes o null si la fecha no es válida.
  */
 const daysUntil = (isoDate, today = new Date()) => {
-  // ...
+  // Comprobamos el formato de la fecha.
+  if (typeof isoDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
+    console.warn('daysUntil: la fecha debe tener el formato aaaa-mm-dd.');
+    return null;
+  }
+
+  // Convertimos la fecha de entrada en un objeto Date con formato de día y hora
+  const targetDate = new Date(isoDate + 'T00:00:00Z');
+
+  // Comprobamos que la fecha es válida.
+  if (Number.isNaN(targetDate.getTime())) {
+    console.warn('daysUntil: la fecha indicada no es válida.');
+    return null;
+  }
+
+  // Comprobamos que la fecha existe.
+  const dateParts = isoDate.split('-');
+
+  if (targetDate.getFullYear() !== Number(dateParts[0]) || targetDate.getMonth() !== Number(dateParts[1]) - 1 ||
+    targetDate.getDate() !== Number(dateParts[2])
+  ) {
+    console.warn('daysUntil: la fecha indicada no es válida.');
+    return null;
+  }
+
+  // Obtenemos las fechas sin tener en cuenta las horas.
+  const targetTime = Date.UTC(
+    targetDate.getUTCFullYear(),
+    targetDate.getUTCMonth(),
+    targetDate.getUTCDate()
+  );
+
+  const todayTime = Date.UTC(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+
+  // Calculamos la diferencia en días.
+  const difference = (targetTime - todayTime) / (1000 * 60 * 60 * 24);
+
+  return difference;
 };
 
+
+
+
 /**
- * Avanza el progreso de una serie hasta su siguiente episodio.
+ * Busca el siguiente episodio pendiente de una serie.
  * @param {Show} show Serie cuyos episodios queremos consultar.
  * @param {Progress} progress Progreso actual de la serie.
  * @returns {Object|null} Devuelve el siguiente episodio o null si no existe.
  */
 const getNextPendingEpisode = (show, progress) => {
 
-  // Si la serie todavía no ha comenzado, busca el primer episodio.
+  // Comprobamos que se han recibido los objetos bien.
+  if (!(show instanceof Show) || !(progress instanceof Progress)) {
+    console.warn('getNextPendingEpisode: se necesita un objeto Show y un objeto Progress.');
+    return null;
+  }
+
+  // Comprobamos que el progreso pertenece a la serie.
+  if (progress.showId !== show.id) {
+    console.warn('getNextPendingEpisode: el progreso no pertenece a esta serie.');
+    return null;
+  }
+
+  // Si no se ha comenzado la serie, busca el primer episodio.
   if (progress.currentSeason === 0 && progress.currentEpisode === 0) {
     return findEpisodeByNumber(show.episodes, 1, 1);
   }
 
-  // Busca el siguiente episodio de la temporada actual.
-  let nextEpisode = findEpisodeByNumber(
-    show.episodes,
-    progress.currentSeason,
-    progress.currentEpisode + 1
-  );
-
-  // Si lo encuentra, lo devuelve.
+  // Buscamos el siguiente episodio.
+  let nextEpisode = findEpisodeByNumber(show.episodes, progress.currentSeason, progress.currentEpisode + 1);
   if (nextEpisode !== null) {
     return nextEpisode;
   }
 
-  // Si no existe, busca el primer episodio de la siguiente temporada.
-  nextEpisode = findEpisodeByNumber(
-    show.episodes,
-    progress.currentSeason + 1,
-    1
-  );
+  // Si no existe, buscamos el primer episodio de la siguiente temporada.
+  nextEpisode = findEpisodeByNumber(show.episodes, progress.currentSeason + 1, 1);
 
   return nextEpisode;
 };
+
 
 /* =============================================================================
    ETAPA 9 — Función avanzada con múltiples operadores (5 puntos)
@@ -908,17 +958,17 @@ const originalRating = breakingBad.rating;                          // Lo guardo
 breakingBad.rating = 8.2;                                           // Cambio a 8.2
 console.log('Rating tras setter válido:', breakingBad.rating);        // 8.2
 breakingBad.rating = 15;                                            // Mayor de 10
-console.log('Rating tras setter inválido:', breakingBad.rating);      // 8.2
+console.log('Rating tras setter erroneo:', breakingBad.rating);      // 8.2
 breakingBad.rating = -1;                                            // Menor de 0
-console.log('Rating tras setter inválido:', breakingBad.rating);      // 8.2
+console.log('Rating tras setter erroneo:', breakingBad.rating);      // 8.2
 breakingBad.rating = '5';                                           // No es un número
-console.log('Rating tras setter inválido:', breakingBad.rating);      // 8.2
+console.log('Rating tras setter erroneo:', breakingBad.rating);      // 8.2
 breakingBad.rating = null;                                          // NULL
 console.log('Rating tras setter null:', breakingBad.rating);          // null
 breakingBad.rating = originalRating;                                // se restaura el dato original
 
 console.log('');
-console.log('===== Verificación de Constructor con datos inválidos =====');
+console.log('===== Verificación de Constructor con datos erroneos =====');
 console.log('');
 const invalidShow = new Show({
     id: -5,
@@ -977,14 +1027,14 @@ console.log('Episodio:', progressTest.currentEpisode);
 console.log('¿Ha comenzado?:', progressTest.hasStarted);
 
 console.log('');
-console.log('===== Avance inválido =====');
+console.log('===== Avance erroneo =====');
 console.log('');
 console.log('Resultado:', progressTest.advance(0, 5));
 console.log('Temporada:', progressTest.currentSeason);
 console.log('Episodio:', progressTest.currentEpisode);
 
 console.log('');
-console.log('===== Avance inválido =====');
+console.log('===== Avance erroneo =====');
 console.log('');
 console.log('Resultado:', progressTest.advance(5, -2));
 console.log('Temporada:', progressTest.currentSeason);
@@ -1044,7 +1094,7 @@ console.log('');
 console.log('Número de series:', myShowList.entries.length);
 
 console.log('');
-console.log('===== Añadir serie inválida =====');
+console.log('===== Añadir serie erronea =====');
 console.log('');
 
 console.log('Añadir objeto incorrecto:', myShowList.addShow({ name: 'Serie falsa' }));
@@ -1169,7 +1219,7 @@ console.log('');
 console.log('Número de series encontradas:', showsByRating.length);
 
 console.log('');
-console.log('===== Filtrar con rango inválido =====');
+console.log('===== Filtrar con rango erroneo =====');
 console.log('');
 
 console.log(
@@ -1251,21 +1301,21 @@ const episodeNotFound = findEpisodeByNumber(breakingBad.episodes, 5, 1);
 console.log('Episodio encontrado:', episodeNotFound);
 
 console.log('');
-console.log('===== Búsqueda con datos inválidos =====');
+console.log('===== Búsqueda con datos erroneos =====');
 console.log('');
 
 console.log(
-  'Array inválido:',
+  'Array erroneo:',
   findEpisodeByNumber('no es un array', 1, 1)
 );
 
 console.log(
-  'Temporada inválida:',
+  'Temporada erronea:',
   findEpisodeByNumber(breakingBad.episodes, 0, 1)
 );
 
 console.log(
-  'Episodio inválido:',
+  'Episodio erroneo:',
   findEpisodeByNumber(breakingBad.episodes, 1, -2)
 );
 
@@ -1351,7 +1401,7 @@ console.log('');
 console.log('===== Validación de datos =====');
 console.log('');
 
-console.log('Array inválido:', getMostCommonGenre(null));
+console.log('Array erroneo:', getMostCommonGenre(null));
 console.log('Array vacío:', getMostCommonGenre([]));
 console.log('Series sin géneros:', getMostCommonGenre([invalidShow]));
 
@@ -1387,8 +1437,8 @@ console.log('');
 console.log('===== Validación de datos =====');
 console.log('');
 
-console.log('Objeto inválido (null):', getShowInfo(null));
-console.log('Objeto inválido (Number):', getShowInfo(Number));
+console.log('Objeto erroneo (null):', getShowInfo(null));
+console.log('Objeto erroneo (Number):', getShowInfo(Number));
 console.log('');
 console.log('Objeto válido (theLastOfUs):', getShowInfo(theLastOfUs) !== null);
 
@@ -1400,3 +1450,42 @@ console.log('****      PRUEBAS ETAPA 8: MANEJO DE FECHAS     ****');
 console.log('****************************************************');
 console.log('');
 console.log('');
+
+console.log('===== Cálculo de días hasta una fecha =====');
+console.log('');
+
+console.log('Fecha futura:', daysUntil('2026-12-01', TODAY));
+console.log('Fecha pasada:', daysUntil('2026-10-01', TODAY));
+console.log('Fecha actual:', daysUntil('2026-11-13', TODAY));
+
+console.log('');
+console.log('===== Validación de fechas =====');
+console.log('');
+
+console.log('Formato incorrecto(20-11-2026):', daysUntil('20-11-2026', TODAY));
+console.log('Mes incorrecto(2026-13-05):', daysUntil('2026-13-05', TODAY));
+console.log('Día inexistente(2026-02-30):', daysUntil('2026-02-30', TODAY));
+
+console.log('');
+console.log('');
+console.log('===== Búsqueda del siguiente episodio =====');
+console.log('');
+
+const newProgressTest = new Progress(breakingBad.id);
+
+console.log('Primer episodio:', getNextPendingEpisode(breakingBad, newProgressTest));
+
+newProgressTest.advance(1, 2);
+
+console.log('Siguiente episodio:',getNextPendingEpisode(breakingBad, newProgressTest));
+
+console.log('');
+console.log('===== Validación de objetos =====');
+console.log('');
+
+console.log('Serie erronea:', getNextPendingEpisode(strangerThings, newProgressTest));
+console.log('Progreso erroneo:', getNextPendingEpisode(breakingBad, null));
+
+const wrongProgress = new Progress(strangerThings.id);
+
+console.log('Progreso de serie confundida:', getNextPendingEpisode(breakingBad, wrongProgress));
