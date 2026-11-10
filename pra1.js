@@ -768,10 +768,58 @@ const getNextPendingEpisode = (show, progress) => {
 /**
  * Devuelve { platform, count, shows, averageRating } para una cadena
  * o plataforma concreta.
+ * @param {Array<Show>} shows Array de series que queremos consultar.
+ * @param {string} platformName Nombre de la cadena o plataforma.
+ * @returns {Object|null} Devuelve la información de la plataforma o null si los datos no son válidos.
  */
 const getShowsByPlatform = (shows, platformName) => {
-  // ...
+
+  // Comprobamos que se han recibido los datos bien.
+  if (!Array.isArray(shows) || typeof platformName !== 'string' || platformName.trim() === '') {
+    console.warn('getShowsByPlatform: los parámetros no son válidos.');
+    return null;
+  }
+
+  // Filtramos las series que pertenecen a la cadena o plataforma.
+  const platformShows = shows.filter(show => {
+
+    if ((show.network && show.network.name === platformName) || (show.webChannel && show.webChannel.name === platformName)) {
+      return true;
+    }
+    return false;
+  });
+
+  // Obtenemos los títulos de las series que hemos encontrado.
+  const showTitles = platformShows.map(show => show.name);
+
+  // Sumamos las valoraciones y contamos las series que tienen valoración.
+  const ratingData = platformShows.reduce((result, show) => {
+
+    if (show.rating !== null) {
+      result.total += show.rating;
+      result.count++;
+    }
+
+    return result;
+  }, { total: 0, count: 0 });
+
+  // Calculamos la valoración media si existen.
+  let averageRating = null;
+
+  if (ratingData.count > 0) {
+    averageRating = ratingData.total / ratingData.count;
+  }
+
+  // Devolvemos el resultado.
+  return {
+    platform: platformName,
+    count: platformShows.length,
+    shows: showTitles,
+    averageRating: averageRating
+  };
 };
+
+
 
 
 /* =============================================================================
