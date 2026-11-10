@@ -1537,3 +1537,36 @@ console.log('Progreso erroneo:', getNextPendingEpisode(breakingBad, null));
 const wrongProgress = new Progress(strangerThings.id);
 
 console.log('Progreso de serie confundida:', getNextPendingEpisode(breakingBad, wrongProgress));
+
+
+
+console.log('');
+console.log('');
+console.log('****************************************************');
+console.log('****    PRUEBAS ETAPA 9: SERIES POR PLATAFORMA ****');
+console.log('****************************************************');
+console.log('');
+console.log('');
+
+const showsTest = [breakingBad,gameOfThrones,strangerThings,theLastOfUs,severance,proyectoAurora];
+
+console.log('===== Búsqueda por cadena o plataforma =====');
+console.log('');
+
+console.log('HBO:', getShowsByPlatform(showsTest, 'HBO'));
+console.log('Netflix:', getShowsByPlatform(showsTest, 'Netflix'));
+console.log('Apple TV+:', getShowsByPlatform(showsTest, 'Apple TV+'));
+
+console.log('');
+console.log('===== Validación de parámetros =====');
+console.log('');
+
+console.log('Array inválido:', getShowsByPlatform(null, 'HBO'));
+console.log('Plataforma vacía:', getShowsByPlatform(showsTest, ''));
+console.log('Plataforma no textual:', getShowsByPlatform(showsTest, 123));
+
+console.log('');
+console.log('===== Plataforma sin resultados =====');
+console.log('');
+
+console.log('Plataforma inexistente:', getShowsByPlatform(showsTest, 'Movistar+'));
